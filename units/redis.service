@@ -1,0 +1,12 @@
+[Unit]
+Name=fleet.redis
+Description=Redis Fleet
+
+[Service]
+ExecStartPre=/usr/bin/docker pull redis
+ExecStartPre=/usr/bin/docker ps -a | /usr/bin/grep fleet.redis | /usr/bin/awk '{print $1}' | /usr/bin/xargs --no-run-if-empty /usr/bin/docker rm -f
+ExecStart=/usr/bin/docker run --rm --name fleet.redis -p 6379:6379 redis redis-server --appendonly yes
+ExecStop=/usr/bin/docker rm -f fleet.redis
+
+[X-Fleet]
+Conflicts=fleet.redis
