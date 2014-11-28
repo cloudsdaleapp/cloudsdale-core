@@ -4,6 +4,13 @@
 **/*.crt
 **/*.pem
 
+config/.htpasswd
+vars/**
+!vars/*.example
+
+# Docker
+/.dockercfg
+
 # Don't include files with sensitive data
 /.zshrc-secrets
 

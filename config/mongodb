@@ -1,0 +1,16 @@
+dbpath = /data
+replSet = cloudsdale
+slave = true
+
+bind_ip = 0.0.0.0
+port = 27017
+
+auth = true
+keyFile = /mongodb.key
+
+logpath = /mongodb.log
+logappend = true
+slowms = 80
+
+nohttpinterface = true
+

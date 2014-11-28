@@ -1,0 +1,19 @@
+[Unit]
+Name=fleet.rabbit
+Description=RabbitMQ Fleet
+
+[Service]
+EnvironmentFile=/home/core/vars/rabbit
+
+ExecStartPre=/usr/bin/docker pull tutum/rabbitmq:latest
+ExecStartPre=/usr/bin/docker ps -a | /usr/bin/grep fleet.rabbit | /usr/bin/awk '{print $1}' | /usr/bin/xargs --no-run-if-empty /usr/bin/docker rm -f
+
+ExecStart=/usr/bin/docker run --rm --name fleet.rabbit -p 172.17.42.1:5672:5672 -p 172.17.42.1:15672:15672 -e RABBITMQ_USER=${RABBITMQ_USER} -e RABBITMQ_PASS=${RABBITMQ_PASS} tutum/rabbitmq:latest
+
+ExecStop=/usr/bin/docker rm -f fleet.rabbit
+
+Restart=on-failure
+RestartSec=5
+
+[X-Fleet]
+Conflicts=fleet.rabbit

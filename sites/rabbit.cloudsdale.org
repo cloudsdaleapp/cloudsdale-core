@@ -1,0 +1,28 @@
+upstream cloudsdale_rabbit {
+    server 172.17.42.1:15672 fail_timeout=0;
+}
+
+server {
+    listen 80;
+    server_name rabbit.cloudsdale.org;
+    rewrite ^ https://$server_name$request_uri? permanent;
+}
+
+server {
+
+    listen 443 ssl;
+    server_name rabbit.cloudsdale.org;
+
+    ssl on;
+    ssl_certificate /etc/nginx/certs/cloudsdale.org.2014.02.01.crt;
+    ssl_certificate_key /etc/nginx/certs/cloudsdale.org.2014.02.01.key;
+    ssl_session_timeout  5m;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers "EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA256:EECDH+aRSA+SHA256:EECDH+ECDSA+SHA384:EECDH+ECDSA+SHA256:EECDH+aRSA+SHA384:EDH+aRSA+AESGCM:EDH+aRSA+SHA256:EDH+aRSA:EECDH:!aNULL:!eNULL:!MEDIUM:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS:!RC4:!SEED";
+
+    location / {
+        proxy_pass http://cloudsdale_rabbit;
+    }
+}
+

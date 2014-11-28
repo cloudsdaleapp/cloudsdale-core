@@ -1,0 +1,14 @@
+[Unit]
+Name=assets
+Description=Assets Volume
+
+[Service]
+ExecStartPre=/usr/bin/docker pull busybox:latest
+ExecStartPre=/usr/bin/docker ps -a | /usr/bin/grep assets | /usr/bin/awk '{print $1}' | /usr/bin/xargs --no-run-if-empty /usr/bin/docker rm -f
+ExecStart=/usr/bin/docker run --rm -v /store/assets:/usr/src/cloudsdale-web/public/assets --name assets busybox:latest tail -f /dev/null
+ExecStop=/usr/bin/docker rm -f assets
+Restart=on-failure
+RestartSec=5
+
+[X-Fleet]
+Conflicts=assets

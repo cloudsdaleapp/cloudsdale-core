@@ -1,21 +1,40 @@
 upstream cloudsdale_web {
-    server unix:/tmp/cloudsdale-puma.sock fail_timeout=0;
+    server 172.17.42.1:8080 fail_timeout=0;
 }
 
 server {
-
     listen 80;
+    server_name cloudsdale.org;
+    rewrite ^ https://$server_name$request_uri? permanent;
+}
 
-    server_name cloudsdale.org
-                www.cloudsdale.org
-                avatar.cloudsdale.org
-                avatar.cdn.cloudsdale.org
-                admin.cloudsdale.org
-                api.cloudsdale.org
-                beta.cloudsdale.org
-                core.cloudsdale.org
-                ;
+server {
+    listen 80;
+    server_name www.cloudsdale.org;
+    rewrite ^ https://$server_name$request_uri? permanent;
+}
 
+server {
+    listen 80;
+    server_name dev.cloudsdale.org;
+    rewrite ^ https://$server_name$request_uri? permanent;
+}
+
+server {
+    listen 80;
+    server_name admin.cloudsdale.org;
+    rewrite ^ https://$server_name$request_uri? permanent;
+}
+
+server {
+    listen 80;
+    server_name beta.cloudsdale.org;
+    rewrite ^ https://$server_name$request_uri? permanent;
+}
+
+server {
+    listen 80;
+    server_name api.cloudsdale.org;
     rewrite ^ https://$server_name$request_uri? permanent;
 }
 
@@ -26,12 +45,9 @@ server {
     server_name cloudsdale.org
                 www.cloudsdale.org
                 avatar.cloudsdale.org
-                avatar.cdn.cloudsdale.org
                 admin.cloudsdale.org
                 api.cloudsdale.org
-                beta.cloudsdale.org
-                core.cloudsdale.org
-                ;
+                beta.cloudsdale.org;
 
     ssl on;
     ssl_certificate /etc/nginx/certs/cloudsdale.org.2014.02.01.crt;
@@ -41,7 +57,51 @@ server {
     ssl_prefer_server_ciphers on;
     ssl_ciphers "EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA256:EECDH+aRSA+SHA256:EECDH+ECDSA+SHA384:EECDH+ECDSA+SHA256:EECDH+aRSA+SHA384:EDH+aRSA+AESGCM:EDH+aRSA+SHA256:EDH+aRSA:EECDH:!aNULL:!eNULL:!MEDIUM:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS:!RC4:!SEED";
 
-    root /var/www/cloudsdale-web/current/public;
+    if ($host ~* ^[^.]+\.[^.]+$) {
+        rewrite ^(.*)$ $scheme://www.$host$1 permanent;
+    }
 
+    root /usr/src/cloudsdale-web/public;
+
+    error_page 404 /404.html;
+    location = /404.html { root /usr/src/cloudsdale-web/public; }
+
+    error_page 422 /422.html;
+    location = /422.html { root /usr/src/cloudsdale-web/public; }
+
+    error_page 500 /500.html;
+    location = /500.html { root /usr/src/cloudsdale-web/public; }
+
+    error_page 502 /502.html;
+    location = /502.html { root /usr/src/cloudsdale-web/public; }
+
+    error_page 503 /503.html;
+    location = /503.html { root /usr/src/cloudsdale-web/public; } 
+
+    location ~ ^/apple-touch-icon(.*)\.png$ {
+        default_type image/png;
+        alias /usr/src/cloudsdale-web/public/apple-icon.png;
+    }
+
+    location / {
+        proxy_pass http://cloudsdale_web;
+        proxy_redirect off;
+
+        proxy_set_header   Host             $host;
+        proxy_set_header   X-Real-IP        $remote_addr;
+        proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+
+        client_max_body_size       10m;
+        client_body_buffer_size    128k;
+
+        proxy_connect_timeout      90;
+        proxy_send_timeout         90;
+        proxy_read_timeout         90;
+
+        proxy_buffer_size          4k;
+        proxy_buffers              4 32k;
+        proxy_busy_buffers_size    64k;
+        proxy_temp_file_write_size 64k;
+    }
 }
 

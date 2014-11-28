@@ -1,0 +1,23 @@
+[Unit]
+Description=Redmon Cloudsdale Web Service
+
+[Service]
+EnvironmentFile=/home/core/vars/web
+EnvironmentFile=/home/core/vars/docker
+
+TimeoutStartSec=15min
+
+ExecStartPre=/usr/bin/docker login -e $DOCKER_EMAIL -p $DOCKER_PASSWORD -u $DOCKER_USERNAME
+ExecStartPre=/usr/bin/docker pull zeeraw/cloudsdale-web:latest
+ExecStartPre=/usr/bin/docker ps -a | /usr/bin/grep fleet.web | /usr/bin/awk '{print $1}' | /usr/bin/xargs --no-run-if-empty /usr/bin/docker rm -f
+ExecStartPre=/usr/bin/docker run --rm --env-file /home/core/vars/web --link fleet.redis:redis --link fleet.mongodb:mongo --link fleet.rabbit:rabbit --link fleet.memcached:memcached --link fleet.push:push --volumes-from gems --volumes-from assets -v /store/uploads:/usr/src/cloudsdale-web/public/uploads -e RAILS_ENV=production zeeraw/cloudsdale-web:latest bundle exec rake assets:precompile assets:upload
+
+ExecStart=/usr/bin/docker run --rm --name fleet.web --env-file /home/core/vars/web --link fleet.redis:redis --link fleet.mongodb:mongo --link fleet.rabbit:rabbit --link fleet.memcached:memcached --link fleet.push:push --volumes-from gems --volumes-from assets -v /store/uploads:/usr/src/cloudsdale-web/public/uploads -v /var/www/cloudsdale-web -p 172.17.42.1:8080:8080 -e RAILS_ENV=production zeeraw/cloudsdale-web:latest bundle exec unicorn_rails -c /usr/src/cloudsdale-web/config/unicorn.rb
+
+ExecStop=/usr/bin/docker rm -f fleet.web
+
+Restart=on-failure
+RestartSec=5
+
+[X-Fleet]
+Conflicts=fleet.web

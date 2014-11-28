@@ -1,0 +1,23 @@
+[Unit]
+Description=Cloudsdale Sidekiq Worker
+BindsTo=web.service
+After=web.service
+
+[Service]
+EnvironmentFile=/home/core/vars/web
+EnvironmentFile=/home/core/vars/docker
+
+TimeoutStartSec=15min
+
+ExecStartPre=/usr/bin/docker ps -a | /usr/bin/grep fleet.worker | /usr/bin/awk '{print $1}' | /usr/bin/xargs --no-run-if-empty /usr/bin/docker rm -f
+
+ExecStart=/usr/bin/docker run --rm --name fleet.worker --env-file /home/core/vars/web --link fleet.redis:redis --link fleet.mongodb:mongo --link fleet.rabbit:rabbit --link fleet.memcached:memcached --link fleet.push:push --volumes-from gems -e RAILS_ENV=production zeeraw/cloudsdale-web:latest bundle exec sidekiq -v -c 8 -q high,4 -q medium,2 -q default,1 -q low,1 -e production
+
+ExecStop=/usr/bin/docker rm -f fleet.worker
+
+Restart=on-failure
+RestartSec=5
+
+[X-Fleet]
+Conflicts=worker
+MachineOf=web.service

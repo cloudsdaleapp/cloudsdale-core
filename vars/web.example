@@ -1,0 +1,55 @@
+GEOIP_CITY=/usr/local/share/GeoIP/GeoLiteCity.dat
+
+API_V2_HOST=http://api.cloudsdale.org
+API_V2_CORS=http://beta.cloudsdale.dev https://beta.cloudsdale.dev http://www.cloudsdale.dev https://www.cloudsdale.dev
+
+ASSETS_FOG_BUCKET=
+
+SESSION_KEY: .cloudsdale.org
+
+CDN_ALIAS=cloudsdale
+CDN_SECRET=
+CDN_KEY=
+CDN_AVATAR_ZONE_ID=
+CDN_AVATAR_ZONE_TYPE=
+
+EMAIL_USER_NAME=
+EMAIL_PASSWORD=
+EMAIL_ADDRESS=smtp.sendgrid.net
+EMAIL_DOMAIN=cloudsdale.org
+EMAIL_PORT=587
+EMAIL_URL_HOST=www.cloudsdale.org
+EMAIL_URL_PORT=80
+
+YOUTUBE_DEV_KEY=
+
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+
+TWITTER_CONSUMER_KEY=
+TWITTER_CONSUMER_SECRET=
+
+FACEBOOK_APP_KEY=
+FACEBOOK_APP_SECRET=
+
+UPLOADER_STORAGE=fog
+RACKSPACE_CLOUDFILES_USERNAME=
+RACKSPACE_CLOUDFILES_API_KEY=
+RACKSPACE_CLOUDFILES_FOG_DIRECTORY=
+RACKSPACE_CLOUDFILES_FOG_HOST=
+
+URL= https://www.cloudsdale.org
+ASSET_URL=
+
+AVATAR_HTTP=
+AVATAR_HTTPS=
+
+REDIS_URL=redis://redis:6379/0
+AMQP_URL=amqp://rabbit:5672
+MONGO_URL=mongo:27017
+MEMCACHED_URL: memcached://memcached:11211/cloudsdale
+
+FAYE_HTTP_URL=http://stream.cloudsdale.org:80/push
+FAYE_HTTPS_URL=https://stream.cloudsdale.org:443/push
+FAYE_TOKEN=
+

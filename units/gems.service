@@ -1,0 +1,16 @@
+[Unit]
+Name=gems
+Description=Ruby Gems Volume
+
+[Service]
+ExecStartPre=/usr/bin/docker pull busybox:latest
+ExecStartPre=/usr/bin/docker ps -a | /usr/bin/grep gems | /usr/bin/awk '{print $1}' | /usr/bin/xargs --no-run-if-empty /usr/bin/docker rm -f
+
+ExecStart=/usr/bin/docker run --rm -v /store/gems:/usr/local/bundle --name gems busybox:latest tail -f /dev/null
+ExecStop=/usr/bin/docker rm -f gems
+
+Restart=on-failure
+RestartSec=5
+
+[X-Fleet]
+Conflicts=gems

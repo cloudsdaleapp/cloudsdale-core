@@ -1,0 +1,15 @@
+[Unit]
+Name=fleet.memcached
+Description=Memcached Fleet
+
+[Service]
+EnvironmentFile=/home/core/vars/memcached
+ExecStartPre=/usr/bin/docker pull tutum/memcached
+ExecStartPre=/usr/bin/docker ps -a | /usr/bin/grep fleet.memcached | /usr/bin/awk '{print $1}' | /usr/bin/xargs --no-run-if-empty /usr/bin/docker rm -f
+ExecStart=/usr/bin/docker run --rm --name fleet.memcached -p 172.17.42.1:11211:11211 -e MEMCACHED_PASS=${MEMCACHED_PASS} tutum/memcached
+ExecStop=/usr/bin/docker rm -f fleet.memcached
+Restart=on-failure
+RestartSec=5
+
+[X-Fleet]
+Conflicts=fleet.memcached

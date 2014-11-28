@@ -1,0 +1,14 @@
+[Unit]
+Name=fleet.mongodb
+Description=MongoDB Fleet
+
+[Service]
+ExecStartPre=/usr/bin/docker pull mongo:2.4.10
+ExecStartPre=/usr/bin/docker ps -a | /usr/bin/grep fleet.mongodb | /usr/bin/awk '{print $1}' | /usr/bin/xargs --no-run-if-empty /usr/bin/docker rm -f
+ExecStart=/usr/bin/docker run --rm --name fleet.mongodb -p 27017:27017 -p 172.17.42.1:28017:28017 -v /home/core/certs/mongodb.key:/mongodb.key:r -v /store/mongodb/db0:/data/db mongo:2.4.10 mongod --auth --rest --replSet cloudsdale --bind_ip 0.0.0.0 --keyFile /mongodb.key
+ExecStop=/usr/bin/docker rm -f fleet.mongodb
+Restart=on-failure
+RestartSec=5
+
+[X-Fleet]
+Conflicts=fleet.mongodb

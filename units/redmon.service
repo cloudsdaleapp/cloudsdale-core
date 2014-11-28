@@ -1,0 +1,15 @@
+[Unit]
+Name=fleet.redmon
+Description=Redmon Redis Fleet
+
+[Service]
+EnvironmentFile=/home/core/vars/redmon
+ExecStartPre=/usr/bin/docker pull vieux/redmon
+ExecStartPre=/usr/bin/docker ps -a | /usr/bin/grep fleet.redmon | /usr/bin/awk '{print $1}' | /usr/bin/xargs --no-run-if-empty /usr/bin/docker rm -f
+ExecStart=/usr/bin/docker run --rm --name fleet.redmon --link fleet.redis:redis -p 172.17.42.1:16379:4567 -e CREDENTIALS=${CREDENTIALS} vieux/redmon -r redis://redis:6379 -s ${CREDENTIALS}
+ExecStop=/usr/bin/docker rm -f fleet.redmon
+Restart=on-failure
+RestartSec=5
+
+[X-Fleet]
+Conflicts=fleet.redmon
