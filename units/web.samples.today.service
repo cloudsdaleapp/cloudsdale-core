@@ -1,0 +1,10 @@
+[Unit]
+Description=Generate Todays Samples
+Requires=docker.service
+Requires=mongodb.service
+Requires=rabbit.service
+Requires=memcached.service
+Requires=redis.service
+
+[Service]
+ExecStart=/usr/bin/docker run --rm --env-file /home/core/vars/web --link fleet.redis:redis --link fleet.mongodb:mongo --link fleet.rabbit:rabbit --link fleet.memcached:memcached --volumes-from gems -e RAILS_ENV=production zeeraw/cloudsdale-web:latest bundle exec rake samples:generate:today

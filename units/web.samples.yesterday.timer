@@ -1,0 +1,9 @@
+[Unit]
+Description=Generate Yesterdays Samples
+Requires=docker.service
+
+[Timer]
+OnCalendar=daily
+
+[X-Fleet]
+X-ConditionMachineOf=web.samples.yesterday.service
