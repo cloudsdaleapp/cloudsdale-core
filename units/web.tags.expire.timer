@@ -3,7 +3,7 @@ Description=Expire Donation Tags
 Requires=docker.service
 
 [Timer]
-OnCalendar=*:0/15
+OnCalendar=*:0/5
 
 [X-Fleet]
 X-ConditionMachineOf=web.tags.expire.service
