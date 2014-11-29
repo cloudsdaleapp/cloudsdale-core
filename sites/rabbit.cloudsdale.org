@@ -14,7 +14,7 @@ server {
     server_name rabbit.cloudsdale.org;
 
     ssl on;
-    ssl_certificate /etc/nginx/certs/cloudsdale.org.2014.02.01.crt;
+    ssl_certificate /etc/nginx/certs/cloudsdale.org.2014.02.01.chained.crt;
     ssl_certificate_key /etc/nginx/certs/cloudsdale.org.2014.02.01.key;
     ssl_session_timeout  5m;
     ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
